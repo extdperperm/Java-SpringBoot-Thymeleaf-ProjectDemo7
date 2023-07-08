@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta th:name="${_csrf.parameterName}" th:content="${_csrf.token}" />
+<title>Spring Boot Project Demo 7 - Eventos session Created y Destroyed</title>
+<link rel="stylesheet" href="./styles/index.css">
+</head>
+<body>
+    <div class="cabecera">
+        <div class="cab1"></div>
+        <div class="cap2"></div>
+    </div>
+    <div class="cuerpo">
+        <div class="panel1">
+            <div class="nota"><div class="notacab1"><p>Proyecto</p></div>
+                              <div class="notabody"><p style="text-align: center;"><span>#Spring Boot Project Demo 7</span></p>
+                            </div>
+            </div>
+            <div class="nota"><div class="notacab1"><p>Objetivos</p></div>
+                              <div class="notabody"><p class="objetivos">- <b>C</b>onocer como se puede capturar el evento sessionCreated y sessionDestroyed.</p>
+                                                    <p class="objetivos">- <b>R</b>reforzar la comprensión de las variables o memoria de aplicación.</p>
+ 
+                            </div>
+            </div>
+            <div class="nota"><div class="notacab2"><p>Entorno de Desarrollo</p></div>
+                              <div class="notabody"><p><span>Ide:</span> Sprint Tool Suite, versión: 4</p>
+                                                    <p><span>Servidor de referencia:</span> Apache Tomcat, versión: 10</p>
+                                                    <p><span>Jdk:</span> OpenJdk, versión: 17.1</p>
+                            </div>
+            </div>
+            <div class="nota"><div class="notacab2"><p>Estandar de Desarrollo</p></div>
+                              <div class="notabody"><p><span>Gestor de proyecto:</span> Maven, versión: 4</p>
+                            </div>
+            </div> 
+            <div class="nota"><div class="notacab2"><p>Dependencias</p></div>
+                              <div class="notabody"><p><span>Spring Boot Framework:</span> Spring, versión 3.1.*. Módulos: spring-boot-starter-web, spring-boot-starter-tomcat, tomcat-embed-jasper, spring-boot-starter-security</p>
+                            </div>
+            </div>    
+            <div class="nota"><div class="notacab2"><p>Documentación y Sitios de Interés</p></div>
+                              <div class="notabody"><p><a href="https://mvnrepository.com/" target="_blank"><b>Ir a</b></a> Maven Repository (para localizar dependencias)</p>
+                                                    <p><a href="https://docs.spring.io/spring-framework/docs/current/reference/html/" target="_blank"><b>Leer</b></a> Documentación de Spring Framework</p>
+                                                    <p><a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/"target="_blank"><b>Leer</b></a> Documentación de Spring Boot</p>
+                                                    <p><a href="https://www.thymeleaf.org/documentation.html" target="_blank"><b>Leer</b></a> Documentación de Thymeleaf (vistas)</p>
+                            </div>
+            </div>         
+        </div>
+        <div class="panel2">
+            <div class="item"><p style="text-align: center;"><span>¿Qué son los eventos sessionCreated y sessionDestroyed?</span></p>
+            				  <p>Son eventos relacionados con el inicio y final de la sesión del cliente en la aplicación.</p>
+            				  <p><b>sessionCreated: </b>Evento que se desata cuando el cliente accede por primera vez a la aplicación o accede a esta desde la última vez desde que finalizara su sesión. Recuerda que el acceso simultaneo desde diferentes navegadores en la misma máquina, se consideran sesiones diferentes e independientes.</p>
+            				  <p><b>sessionDestroyed: </b>Evento que se desata cuando el cliente finaliza la sesión. Recuerda, que el fin de la sesión está extrechamente relacionado con el parámetro server.servlet.session.timeout. Lo que hace Java es que, tras detectar inactividad por parte del cliente transcurrido el tiempo que indica dicho parámetro, cierra su sesión y destruye toda la memoria de usuario relativa a dicha sesión.</p>
+            				  <p><b style="color:red;">Importante: </b>Al igual que en el fichero <em>application.properties</em> de este proyecto puede especificar el tiempo máximo permitido de inactividad del cliente (server.servlet.session.timeout), a nivel del servidor, también se puede especificar. Siempre prevalecerá la configuración del servidor sobre la de la aplicación.</p>
+            </div>
+            <div class="item"><p style="text-align: center;"><span>¿Cómo se ha configurado el proyecto para capturar los eventos sessionCreated y sessionDestroyed?</span></p>
+            				  <p>Se han seguido los siguientes pasos: </p>
+            				  <p><b>1º</b> Se ha añadido en el pom.xml la dependencia de Spring Security (spring-boot-starter-security). El motivo, es que Spring Security al ejecutarse configura el <em>ServletContextInitializer</em>, un "listener" que permite entre otras cosas, que Java esté a la escucha de estos eventos.</p>
+							  <p><b>2º</b> Se configuró Spring Security creando la clase de configuración <em>SecurityConfiguration.java</em>. Como por defecto Spring Security "capa" todos los accesos, se configuró para permitir por defecto el acceso a todo sin autenticación (esto dependerá de tus necesidades).</p>
+							  <p><b>3º</b> Por último, se creo la clase <em>SessionEvents.java</em> que implementa la interfaz HttpSessionListener. Se implementó a modo de prueba un contador de sesiones activas que podrá comprobar con lo indicado en el Ejemplo 1.</p>
+							  <p><b style="color:red;">Importante: </b> Se recomienda añadir en la cabecera de todas las vistas .html el siguiente código para forzar la ejecución de Thymeleaf (que favorece la captura del evento sessionCreated) y además al estar bajo el módulo de seguridad, se recomienda disponer del token _csrf para futuras peticiones post al servidor:</p>
+							  <p style="text-align: center;"><img src="./img/thymeleaf-csrf.jpg" alt="Ejemplo meta csrf"/></p>
+            </div>
+            <div class="item"><p><span>Ejemplo 1 - Contador de sesiones activas:</span> Si examina el código implementado en los eventos sessionCreated y sessionDestroyed (SessionEvents.java), se creó un atributo <b>statico</b> para que los hilos de ejecución de las diferentes sesiones de los usuarios lo incremente (iniciar) o lo decrementen (finalizar). De esta forma, en dicha variable estática podemos disponer del número de sesiones activas en la memoria de la aplicación. Prueba a acceder desde diferentes navegadores o máquinas y comprueba como se incrementa y decrementa:</p>
+            				  <p style="text-align: center;"><span>Nº SESIONES ACTIVAS: </span><b style="font-size: 30px;" th:text="${SesionesActivas}">[N]</b></p>
+            				  <p><b style="color:red;">Importante: </b> Al ejecutarse en paralelo el evento sessionCreated y el código de la controladora, es normal que inicialmente vea a 0 este contador. Pruebe a refrescar y verá que ya aparece el dato. Esto se debe a que la ejecución de la controladora suele ser más rapida que la del evento sessionCreated.</p>
+            </div>
+            
+        </div>
+    </div>
+    <div class="pie"><p><span>©</span> 2023 - Daniel Pérez Pérez</p></div>
+
+</body>
+</html>
